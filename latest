@@ -3,6 +3,14 @@
 # author:       Li Junhao           l@x-cmd.com
 # license:      GPLv3
 
+# Reference: https://imagemagick.org/script/download.php
+
+# https://download.imagemagick.org/ImageMagick/download/binaries/magick
+
+# China
+
+# https://ftp.acc.umu.se/mirror/imagemagick.org/ftp/binaries/magick
+
 ___x_cmd_magick(){
     while [ $# -gt 0 ]; do
         case "$1" in
