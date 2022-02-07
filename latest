@@ -3,35 +3,15 @@
 # author:       Li Junhao           l@x-cmd.com
 # license:      GPLv3
 
-# Reference: https://imagemagick.org/script/download.php
-
-# https://download.imagemagick.org/ImageMagick/download/binaries/magick
-# https://download.imagemagick.org/ImageMagick/download/binaries/ImageMagick-x86_64-apple-darwin20.1.0.tar.gz
-
-# win64
-# https://download.imagemagick.org/ImageMagick/download/binaries/ImageMagick-7.1.0-portable-Q16-HDRI-x64.zip
-
-
-
-# China
-
-# https://ftp.acc.umu.se/mirror/imagemagick.org/ftp/binaries/magick
-
-___X_CMD_MAGICK_MIRROR_OFFICIAL="https://download.imagemagick.org/ImageMagick/download/"
-___X_CMD_MAGICK_MIRROR_UMU="https://ftp.acc.umu.se/mirror/imagemagick.org/ftp"
+xrc static-build/staticbin
 
 ___x_cmd_magick(){
-    while [ $# -gt 0 ]; do
-        case "$1" in
-            htt*)       x curl "$1"     ;;
-            # TODO: add resource for x path
-            *)          cat "$1"        ;;
-            # If json, use json color
-            # If source file, use language parser
-        esac
-
-        shift
-    done
+    ___x_cmd_staticbin_init \
+        ___x_cmd_magick \
+        "$___X_CMD_ROOT/.bin/magick" \
+        magick \
+        ___x_cmd_magick_bin_download_url \
+        && ___x_cmd_magick "$@"
 }
 
 
@@ -97,26 +77,37 @@ ___x_cmd_staticbin_download(){
 
 # Section: detail
 
-#  https://github.com/jgm/pandoc/releases/download/2.17.0.1/pandoc-2.17.0.1-macOS.zip
-#  https://github.com.cnpmjs.org/jgm/pandoc/releases/download/2.17.0.1/pandoc-2.17.0.1-macOS.zip
-#  TODO: provide gitcode
+# Reference: https://imagemagick.org/script/download.php
 
-___x_cmd_pandoc_bin_download_url(){
+# https://download.imagemagick.org/ImageMagick/download/binaries/magick
+# https://download.imagemagick.org/ImageMagick/download/binaries/ImageMagick-x86_64-apple-darwin20.1.0.tar.gz
+
+# win64
+# https://download.imagemagick.org/ImageMagick/download/binaries/ImageMagick-7.1.0-portable-Q16-HDRI-x64.zip
+
+# China
+
+# https://ftp.acc.umu.se/mirror/imagemagick.org/ftp/binaries/magick
+
+___X_CMD_MAGICK_MIRROR_OFFICIAL="https://download.imagemagick.org/ImageMagick/download/"
+___X_CMD_MAGICK_MIRROR_UMU="https://ftp.acc.umu.se/mirror/imagemagick.org/ftp"
+
+___x_cmd_magick_bin_download_url(){
     local sys
     sys="$(os rname)-$(os-arch)"
     local p
     case "$sys" in
         Darwin-*)
-            p="2.17.0.1/pandoc-2.17.0.1-macOS.zip"
+            p="2.17.0.1/magick-2.17.0.1-macOS.zip"
             ;;
         win-*)
-            p="2.17.0.1/pandoc-2.17.1.1-windows-x86_64.zip"
+            p="2.17.0.1/magick-2.17.1.1-windows-x86_64.zip"
             ;;
         linux-amd64)
-            p="2.17.0.1/pandoc-2.17.1.1-linux-amd64.tar.gz"
+            p="2.17.0.1/magick-2.17.1.1-linux-amd64.tar.gz"
             ;;
         linux-arm64)
-            p="2.17.0.1/pandoc-2.17.1.1-linux-arm64.tar.gz"
+            p="2.17.0.1/magick-2.17.1.1-linux-arm64.tar.gz"
             ;;
         *)
             printf "System Not Supported: %s\n" "$sys" >&2
@@ -124,12 +115,12 @@ ___x_cmd_pandoc_bin_download_url(){
     esac
 
     if "$___X_CMD_WHICHNET"; then
-        printf "%s/%s" "https://github.com/jgm/pandoc/releases/download" "$p"
+        printf "%s/%s" "https://github.com/jgm/magick/releases/download" "$p"
     else
-        printf "%s/%s" "https://github.com.cnpmjs.org/jgm/pandoc/releases/download" "$p"
+        printf "%s/%s" "https://github.com.cnpmjs.org/jgm/magick/releases/download" "$p"
     fi
 }
 
 # EndSection
 
-xrc setmain ___x_cmd_pandoc
+xrc setmain ___x_cmd_magick
