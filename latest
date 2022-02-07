@@ -34,4 +34,102 @@ ___x_cmd_magick(){
     done
 }
 
-xrc setmain ___x_cmd_magick
+
+# Section: staticbin
+# xrc static-build/staticbin
+___x_cmd_staticbin_init(){
+    local funcname="${1:?Provide function name}"
+    shift 1
+
+    local bin
+    bin="$(___x_cmd_staticbin_which "$1" "$2" "$3")" || return 1
+
+    eval "
+    $funcname(){
+        $bin \"\$@\"
+    }
+    "
+}
+
+___x_cmd_staticbin_run(){
+    local bin
+    bin="$(___x_cmd_staticbin_which "$1" "$2" "$3")" || return 1
+
+    shift 3
+    "$bin" "$@"
+}
+
+___x_cmd_staticbin_which(){
+    local cachebin="${1:?Provide default cache bin}"
+    local sysbin="${2:?Sysbin name}"
+    local fun_url="${3:?candidate url generator}"
+
+    [ -f "$cachebin" ] && printf "%s\n" "$cachebin" && return
+    command -v "$sysbin" 2>/dev/null || return
+    ___x_cmd_staticbin_download "$cachebin" "$fun_url" && printf "%s\n" "$cachebin" && return
+
+    printf "%s\n" "Cannot find executable file." >&2
+    return 1
+}
+
+___x_cmd_staticbin_download(){
+    local cache="${1:?Provide path}"
+    local fun_url="${2:?Candidate url generator}"
+
+    local IFS="
+"
+
+    local result
+    if ! result="$(
+        $fun_url | while read -r url; do
+        if ___x_cmd_httpget "$url" "$cache"; then
+            return 0
+        else
+            printf "%s\n" "$url"
+        fi
+    done
+    )"; then
+        printf "Failed to download from:\n%s\n" "$result"
+    fi
+
+}
+# EndSection
+
+# Section: detail
+
+#  https://github.com/jgm/pandoc/releases/download/2.17.0.1/pandoc-2.17.0.1-macOS.zip
+#  https://github.com.cnpmjs.org/jgm/pandoc/releases/download/2.17.0.1/pandoc-2.17.0.1-macOS.zip
+#  TODO: provide gitcode
+
+___x_cmd_pandoc_bin_download_url(){
+    local sys
+    sys="$(os rname)-$(os-arch)"
+    local p
+    case "$sys" in
+        Darwin-*)
+            p="2.17.0.1/pandoc-2.17.0.1-macOS.zip"
+            ;;
+        win-*)
+            p="2.17.0.1/pandoc-2.17.1.1-windows-x86_64.zip"
+            ;;
+        linux-amd64)
+            p="2.17.0.1/pandoc-2.17.1.1-linux-amd64.tar.gz"
+            ;;
+        linux-arm64)
+            p="2.17.0.1/pandoc-2.17.1.1-linux-arm64.tar.gz"
+            ;;
+        *)
+            printf "System Not Supported: %s\n" "$sys" >&2
+            return 1
+    esac
+
+    if "$___X_CMD_WHICHNET"; then
+        printf "%s/%s" "https://github.com/jgm/pandoc/releases/download" "$p"
+    else
+        printf "%s/%s" "https://github.com.cnpmjs.org/jgm/pandoc/releases/download" "$p"
+    fi
+}
+
+# EndSection
+
+xrc setmain ___x_cmd_pandoc
